@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import Header from '../../components/Header'; // We will use this header for the title/back arrow
 import LogoutSuccessModal from '../../components/LogoutSuccessModal'; // NEW Component
 

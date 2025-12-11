@@ -3,52 +3,54 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../app/constants/Styles';
+import { COLORS } from '../constants/Styles';
 
 interface CardProps {
   primaryText: string;
   secondaryText: string;
   isSelected: boolean;
-  isDisabled: boolean; // For shuttles already picked
+  isDisabled: boolean;
   onPress: () => void;
 }
 
-const SelectionCard: React.FC<CardProps> = ({ 
-  primaryText, 
-  secondaryText, 
-  isSelected, 
-  isDisabled, 
-  onPress 
+const SelectionCard: React.FC<CardProps> = ({
+  primaryText,
+  secondaryText,
+  isSelected,
+  isDisabled,
+  onPress
 }) => {
-  
+
   const cardStyle = [
     styles.card,
-    isSelected && styles.selectedCard, // Blue border when selected
-    isDisabled && styles.disabledCard, // Gray border when disabled
+    isSelected === true && styles.selectedCard,
+    isDisabled && styles.disabledCard,
   ];
 
-  const textStyle = [
+  const primaryStyle = [
     styles.primaryText,
-    isSelected && styles.selectedText, // Blue text when selected
+    isSelected === true && styles.selectedPrimaryText,
+    isDisabled && styles.disabledText
   ];
 
-  const subTextStyle = [
+  const secondaryStyle = [
     styles.secondaryText,
-    isSelected && styles.selectedText,
-  ]
-  
+    isSelected === true && styles.selectedSecondaryText,
+    isDisabled && styles.disabledText
+  ];
+
   return (
-    <TouchableOpacity 
-      style={cardStyle} 
-      onPress={isDisabled ? undefined : onPress} // Do nothing if disabled
-      activeOpacity={isDisabled ? 1.0 : 0.6}
+    <TouchableOpacity
+      style={cardStyle}
+      onPress={isDisabled ? undefined : onPress}
+      activeOpacity={isDisabled ? 1 : 0.6}
     >
       <View style={styles.textContainer}>
-        <Text style={textStyle}>{primaryText}</Text>
-        <Text style={subTextStyle}>{secondaryText}</Text>
+        <Text style={primaryStyle}>{primaryText}</Text>
+        <Text style={secondaryStyle}>{secondaryText}</Text>
       </View>
-      
-      {isSelected && (
+
+      {isSelected && !isDisabled && (
         <View style={styles.checkmark}>
           <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
         </View>
@@ -63,34 +65,50 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
-    marginBottom: 10,
     backgroundColor: COLORS.secondary,
+    marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   selectedCard: {
     borderColor: COLORS.primary,
+    backgroundColor: '#EEF6FF', // light tint so selection is obvious
   },
+
   disabledCard: {
     backgroundColor: COLORS.disabled,
     borderColor: COLORS.disabled,
   },
+
   textContainer: {
     flex: 1,
   },
+
   primaryText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.text,
   },
+
   secondaryText: {
     fontSize: 14,
     color: COLORS.textFaded,
   },
-  selectedText: {
+
+  selectedPrimaryText: {
     color: COLORS.primary,
   },
+
+  selectedSecondaryText: {
+    color: COLORS.primary,
+  },
+
+  disabledText: {
+    color: '#999',
+  },
+
   checkmark: {
     marginLeft: 10,
   }

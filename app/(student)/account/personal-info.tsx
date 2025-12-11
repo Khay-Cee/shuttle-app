@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../../constants/Styles';
 
 // --- MOCK DATA ---
 const INITIAL_USER = {

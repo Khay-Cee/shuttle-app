@@ -17,55 +17,55 @@ export interface ApiResponse<T> {
 export interface JwtRequest {
   email: string;
   password: string;
-  loginType?: string;
+  loginType?: string; // "driver" or "student" (optional)
 }
 
 export interface JwtResponse {
   accessToken: string;
-  refreshToken?: string; // May be returned in body for mobile
+  refreshToken?: string; // mobile may receive it in body; cookie also issued by server
   user: UserDto;
 }
 
 export interface RefreshRequest {
-  refreshToken?: string; // Optional if cookie present
+  refreshToken?: string; // optional when using cookie-based refresh
 }
 
 export interface UserDto {
   id: number;
   email: string;
-  fullName: string;
   role: string;
+  firstName?: string;
+  lastName?: string;
   schoolId?: number;
+  username?: string;
   createdAt?: string;
 }
 
 export interface StudentDto extends UserDto {
-  studentId?: string;
-  phoneNumber?: string;
+  studentIdNumber?: string;
+  schoolName?: string;
 }
 
 export interface DriverDto extends UserDto {
-  licenseNumber: string;
-  phoneNumber?: string;
   status?: string;
 }
 
 export interface RegisterStudentRequest {
+  studentIdNumber?: string;
+  firstName: string;
+  lastName: string;
+  schoolName: string;
+  username?: string;
   email: string;
   password: string;
-  fullName: string;
-  schoolId: number;
-  phoneNumber?: string;
-  studentId?: string;
 }
 
 export interface RegisterDriverRequest {
+  firstName: string;
+  lastName: string;
+  schoolName: string;
   email: string;
   password: string;
-  fullName: string;
-  licenseNumber: string;
-  schoolId: number;
-  phoneNumber?: string;
 }
 
 // ==================== Trip/Reminder DTOs ====================
@@ -75,7 +75,7 @@ export interface TripReminderRequestDto {
   shuttleId: number;
   pickupStopId: number;
   dropoffStopId: number;
-  reminderOffsetMinutes?: number; // 3, 5, 10, or 15
+  reminderOffsetMinutes: number; // must be one of 3,5,10,15
 }
 
 export interface TripActivityDto {
@@ -84,9 +84,11 @@ export interface TripActivityDto {
   shuttleId: number;
   departureStopId: number;
   arrivalStopId: number;
-  estimatedTime?: string;
+  routeId: number;
+  estimatedTime?: string; // ISO timestamp
+  actualTime?: string;
   status: string;
-  reminderOffsetMinutes?: number;
+  reminderOffsetMinutes: number;
   reminderScheduledAt?: string;
   notificationSent?: boolean;
 }
@@ -98,14 +100,19 @@ export interface TripMatchRequest {
   dropoffStopName?: string;
 }
 
+export interface MatchedShuttleDto {
+  shuttleId: number;
+  shuttleExternalId?: string;
+  status: string;
+  latitude: number;
+  longitude: number;
+  etaToPickup?: number; // seconds, nullable
+}
+
 export interface MatchedRouteDto {
   routeId: number;
-  shuttleId: number;
-  shuttleName?: string;
-  pickupStop?: StopDto;
-  dropoffStop?: StopDto;
-  estimatedDuration?: number;
-  distance?: number;
+  routeName: string;
+  activeShuttles: MatchedShuttleDto[];
 }
 
 export interface TripMatchResponse {
@@ -133,13 +140,11 @@ export interface StopDto {
 // ==================== Shuttle DTOs ====================
 
 export interface ShuttleDto {
-  id: number;
+  shuttleId: number;
   licensePlate: string;
   capacity: number;
-  status?: string;
+  status: string;
   schoolId: number;
-  driverId?: number;
-  currentLocation?: ShuttleLocationDto;
 }
 
 export interface RegisterShuttleRequest {
@@ -151,36 +156,31 @@ export interface RegisterShuttleRequest {
 
 export interface ShuttleLocationDto {
   shuttleId: number;
-  latitude?: number;
-  longitude?: number;
-  accuracy?: number;
-  heading?: number;
-  speed?: number;
-  createdAt?: string;
+  latitude: number;
+  longitude: number;
+  createdAt?: string; // ISO timestamp
 }
 
 export interface LocationBroadcastDto {
   shuttleId: number;
-  latitude: number;
-  longitude: number;
-  timestamp?: string;
-  createdAt?: string;
+  lat: number;
+  lng: number;
+  timestamp: string; // ISO timestamp
 }
 
 // ==================== Route DTOs ====================
 
 export interface RouteDto {
-  id: number;
+  routeId: number;
   routeName: string;
-  schoolId: number;
-  stops?: StopDto[];
-  isActive?: boolean;
+  description?: string;
+  schoolId?: number;
 }
 
 export interface RouteResponseDto {
   routeId: number;
   routeName?: string;
-  stops: StopDto[];
+  stops?: StopDto[];
   coordinates?: RouteCoordinate[];
   polyline?: string;
 }
@@ -194,21 +194,31 @@ export interface RouteCoordinate {
 // ==================== ETA DTOs ====================
 
 export interface EtaResponseDto {
+  shuttleId: number;
+  pickupStopId: number;
+  dropoffStopId: number;
   etaMillis: number;
   etaTimestamp: string;
-  distanceMeters: number;
-  debug?: any;
+  distanceShuttleToPickup: number;
+  distancePickupToDrop: number;
+  totalDistance: number;
+  direction?: string | null;
+  speedKph?: number | null;
+  shuttleSegmentIndex?: number | null;
+  pickupSegmentIndex?: number | null;
+  dropoffSegmentIndex?: number | null;
+  debug?: string | null;
 }
 
 // ==================== Driver Session DTOs ====================
 
 export interface StartSessionRequest {
   shuttleId: number;
-  routeId?: number;
+  routeId: number;
 }
 
 export interface DriverSessionResponse {
-  id: number;
+  sessionId: number;
   shuttleId: number;
   routeId?: number;
   startedAt: string;
@@ -227,9 +237,6 @@ export interface LocationUpdateDto {
   shuttleId: number;
   latitude: number;
   longitude: number;
-  accuracy?: number;
-  heading?: number;
-  speed?: number;
   createdAt?: string;
 }
 

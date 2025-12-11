@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../constants/Styles';
+import { COLORS } from '../../constants/Styles';
 
 const REDIRECT_DELAY = 3000; // 3 seconds before redirecting
 

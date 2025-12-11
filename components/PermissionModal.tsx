@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../app/constants/Styles';
+import { COLORS } from '../constants/Styles';
 
 interface PermissionModalProps {
   isVisible: boolean;

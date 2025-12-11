@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Keyboard, FlatList, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import Header from '../../components/Header';
 
 // --- DUMMY DATA ---

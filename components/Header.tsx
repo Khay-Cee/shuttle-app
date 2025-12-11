@@ -4,7 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../app/constants/Styles';
+import { COLORS } from '../constants/Styles';
 import ProgressIndicator from './ProgressIndicator'; // New Import
 
 interface HeaderProps {

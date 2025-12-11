@@ -46,16 +46,13 @@ const processQueue = (error: any = null, token: string | null = null) => {
  * Refresh access token using refresh token
  */
 const refreshAccessToken = async (): Promise<string> => {
-  const refreshToken = await getRefreshToken();
-  
-  if (!refreshToken) {
-    throw new Error('No refresh token available');
-  }
-
   try {
+    const refreshToken = await getRefreshToken();
+
+    // When token is stored, send it in the body; otherwise rely on refresh cookie
     const response = await axios.post<ApiResponse<JwtResponse>>(
       `${API_BASE_URL}/auth/refresh`,
-      { refreshToken },
+      refreshToken ? { refreshToken } : {},
       {
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +68,7 @@ const refreshAccessToken = async (): Promise<string> => {
       throw new Error('No access token in refresh response');
     }
 
-    // Save new tokens
+    // Save new tokens (access is always present; refresh may be in body or cookie only)
     await saveAccessToken(newAccessToken);
     if (newRefreshToken) {
       await saveRefreshToken(newRefreshToken);
@@ -92,8 +89,9 @@ apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     // Skip auth header for auth endpoints
     const isAuthEndpoint = config.url?.includes('/auth/login') || 
-                          config.url?.includes('/auth/signup') ||
-                          config.url?.includes('/auth/refresh');
+                config.url?.includes('/auth/signup') ||
+                config.url?.includes('/auth/refresh') ||
+                config.url?.includes('/auth/logout');
     
     if (!isAuthEndpoint) {
       const token = await getAccessToken();

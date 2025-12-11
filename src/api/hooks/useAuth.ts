@@ -49,7 +49,7 @@ export function useLogin() {
         credentials
       );
 
-      const data = response.data?.data || response.data;
+      const data = (response.data as ApiResponse<JwtResponse>)?.data || response.data;
       
       // Save tokens
       await saveAccessToken(data.accessToken);
@@ -89,13 +89,15 @@ export function useSignupStudent() {
     setState({ data: null, isLoading: true, error: null });
     
     try {
-      const response = await apiClient.post<StudentDto>(
+      const response = await apiClient.post<ApiResponse<StudentDto>>(
         '/auth/signup/student',
         studentData
       );
 
-      setState({ data: response.data, isLoading: false, error: null });
-      return response.data;
+      const data = response.data?.data || response.data;
+
+      setState({ data, isLoading: false, error: null });
+      return data;
     } catch (error) {
       const errorMessage = handleApiError(error);
       setState({ data: null, isLoading: false, error: errorMessage });
@@ -123,13 +125,15 @@ export function useSignupDriver() {
     setState({ data: null, isLoading: true, error: null });
     
     try {
-      const response = await apiClient.post<DriverDto>(
+      const response = await apiClient.post<ApiResponse<DriverDto>>(
         '/auth/signup/driver',
         driverData
       );
 
-      setState({ data: response.data, isLoading: false, error: null });
-      return response.data;
+      const data = response.data?.data || response.data;
+
+      setState({ data, isLoading: false, error: null });
+      return data;
     } catch (error) {
       const errorMessage = handleApiError(error);
       setState({ data: null, isLoading: false, error: errorMessage });
@@ -219,7 +223,7 @@ export function useRefresh() {
     try {
       const response = await apiClient.post<ApiResponse<JwtResponse>>(
         '/auth/refresh',
-        { refreshToken }
+        refreshToken ? { refreshToken } : {}
       );
 
       const data = response.data?.data || response.data;

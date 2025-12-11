@@ -4,40 +4,70 @@ import React, { useState } from 'react';
 import { 
     View, 
     Text, 
-    StyleSheet, // Ensure StyleSheet is imported
+    StyleSheet,
     TouchableOpacity, 
-    ScrollView 
+    ScrollView,
+    ActivityIndicator
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import SelectionCard from '../../components/SelectionCard';
 import Header from '../../components/Header';
 import WarningModal from '../../components/WarningModal';
-
-type Shuttle = {
-  id: string;
-  license: string;
-  available: boolean;
-};
+import { useGetShuttles } from '../../src/api/hooks/useShuttle';
+import { ShuttleDto } from '../../src/types/api';
 
 const ShuttleSelectScreen = () => {
   const router = useRouter();
-  const [selectedShuttleId, setSelectedShuttleId] = useState<string | null>(null);
+  const { shuttles, isLoading, error } = useGetShuttles();
+
+  const [selectedShuttleId, setSelectedShuttleId] = useState<number | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false); 
+  const [selectedShuttle, setSelectedShuttle] = useState<ShuttleDto | null>(null);
 
-  const shuttleData: Shuttle[] = [
-    { id: 'SS01', license: 'GS 1068-20', available: true },
-    { id: 'SS02', license: 'GS 2014-21', available: false }, // Disabled
-    { id: 'SS03', license: 'GT 555-22', available: true },
-  ];
-
-  const handleShuttleSelection = (shuttle: Shuttle) => {
-    if (!shuttle.available) {
-      setIsModalVisible(true); // Show modal if unavailable
-    } else {
-      setSelectedShuttleId(shuttle.id); // Otherwise, select it
+  const handleShuttleSelection = (shuttle: ShuttleDto) => {
+    // 🛑 If shuttle is already in use, show modal
+    if (shuttle.inUse) {
+      setSelectedShuttle(shuttle);
+      setIsModalVisible(true);
+      return;
     }
+
+    // Otherwise select the shuttle
+    setSelectedShuttleId(shuttle.shuttleId);
   };
+
+  if (isLoading) {
+    return (
+      <View style={COMMON_STYLES.container}>
+        <Header 
+          title="Select Shuttle" 
+          showBack={false} 
+          progress={{ currentStep: 1, totalSteps: 3 }} 
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading shuttles...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={COMMON_STYLES.container}>
+        <Header 
+          title="Select Shuttle" 
+          showBack={false} 
+          progress={{ currentStep: 1, totalSteps: 3 }} 
+        />
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error loading shuttles</Text>
+          <Text style={styles.errorMessage}>{String(error)}</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={COMMON_STYLES.container}>
@@ -48,48 +78,78 @@ const ShuttleSelectScreen = () => {
       />
       
       <ScrollView contentContainerStyle={styles.list}>
-        {shuttleData.map((shuttle) => (
+        {shuttles.map((shuttle) => (
           <SelectionCard
-            key={shuttle.id}
-            primaryText={shuttle.id}
-            secondaryText={`LICENSE PLATE\n${shuttle.license}`} 
-            isSelected={selectedShuttleId === shuttle.id}
-            isDisabled={!shuttle.available}
+            key={shuttle.externalId}  // stable unique key
+            primaryText={shuttle.externalId}   // ✅ FIXED — show backend externalId
+            secondaryText={`LICENSE PLATE\n${shuttle.licensePlate}`} 
+            isSelected={selectedShuttleId === shuttle.shuttleId}
+            isDisabled={shuttle.inUse}   // 🔥 Real backend truth
             onPress={() => handleShuttleSelection(shuttle)} 
           />
         ))}
       </ScrollView>
       
       <TouchableOpacity 
-        style={[styles.confirmButton, !selectedShuttleId && styles.disabledButton]}
+        style={[
+          styles.confirmButton, 
+          !selectedShuttleId && styles.disabledButton
+        ]}
         disabled={!selectedShuttleId}
-        onPress={() => router.push('/(driver)/route-select')} 
+        onPress={() => router.push('/(driver)/route-select')}
       >
         <Text style={styles.confirmButtonText}>CONFIRM SELECTION</Text>
       </TouchableOpacity>
 
       <WarningModal
         isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)} // Tapping the screen closes the modal
+        onClose={() => setIsModalVisible(false)}
         title="Shuttle Unavailable"
-        message="This shuttle is currently in use. Please select another shuttle."
+        message={`${selectedShuttle?.licensePlate || 'This shuttle'} is currently in use by another driver. Please select another shuttle.`}
       />
     </View>
   );
 };
 
-// V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-// THIS IS THE MISSING STYLES DEFINITION BLOCK THAT FIXES THE ERROR
+// -----------------------------------------
+// Styles
+// -----------------------------------------
 const styles = StyleSheet.create({
   list: {
     paddingVertical: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#e74c3c',
+    marginBottom: 10,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: COLORS.text,
+    textAlign: 'center',
   },
   confirmButton: {
     backgroundColor: COLORS.primary,
     borderRadius: 8,
     padding: 15,
     alignItems: 'center',
-    // margin: 20, // Removed margin to stick to bottom better with flex layout
   },
   disabledButton: {
     backgroundColor: COLORS.disabled,
@@ -98,9 +158,8 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: COLORS.secondary,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
 });
-// ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
 
 export default ShuttleSelectScreen;

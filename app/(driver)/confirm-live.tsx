@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import Header from '../../components/Header';
 import PermissionModal from '../../components/PermissionModal'; // NEW Component Import
 

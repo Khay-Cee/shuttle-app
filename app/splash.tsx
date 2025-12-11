@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS } from './constants/Styles';
+import { COLORS } from '../constants/Styles';
 
 // The full text to be typed
 const FULL_TAGLINE = 'Your time, tracked in a minute';

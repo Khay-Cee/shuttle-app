@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../constants/Styles';
+import { COLORS } from '../../constants/Styles';
 
 type MapModule = typeof import('react-native-maps') | null;
 

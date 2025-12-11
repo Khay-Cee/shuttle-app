@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Animated, Easing } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS } from './constants/Styles';
+import { COLORS } from '../constants/Styles';
 import TypingIndicator from '../components/TypingIndicator';
 
 // --- Full Conversation Data ---

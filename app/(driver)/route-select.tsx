@@ -1,47 +1,98 @@
 // app/(driver)/route-select.tsx
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
-import SelectionCard from '../../components/SelectionCard'; 
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
+import SelectionCard from '../../components/SelectionCard';
 import Header from '../../components/Header';
+import { useGetRoutes } from '../../src/api/hooks/useShuttle';
 
 const RouteSelectScreen = () => {
   const router = useRouter();
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const { routes, isLoading, error } = useGetRoutes();
+  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
 
-  const routeData = [
-    { id: 'R1', name: 'North Campus', description: 'Brunei → KSB' },
-    { id: 'R2', name: 'South Campus', description: 'Library → Admin' },
-    // ...
-  ];
+  // Reset selection when routes change
+  React.useEffect(() => {
+    setSelectedRouteId(null);
+  }, [routes]);
 
+  // ---------------------------
+  // LOADING STATE
+  // ---------------------------
+  if (isLoading) {
+    return (
+      <View style={COMMON_STYLES.container}>
+        <Header
+          title="Select Your Route"
+          showBack={true}
+          progress={{ currentStep: 2, totalSteps: 3 }}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Loading routes...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // ---------------------------
+  // ERROR STATE
+  // ---------------------------
+  if (error) {
+    return (
+      <View style={COMMON_STYLES.container}>
+        <Header
+          title="Select Your Route"
+          showBack={true}
+          progress={{ currentStep: 2, totalSteps: 3 }}
+        />
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error loading routes</Text>
+          <Text style={styles.errorMessage}>{String(error)}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // ---------------------------
+  // MAIN UI
+  // ---------------------------
   return (
     <View style={COMMON_STYLES.container}>
-      <Header 
-        title="Select Your Route" 
-        showBack={true} 
-        progress={{ currentStep: 2, totalSteps: 3 }} // Set progress to step 2 of 3
+      <Header
+        title="Select Your Route"
+        showBack={true}
+        progress={{ currentStep: 2, totalSteps: 3 }}
       />
-      
+
       <ScrollView contentContainerStyle={styles.list}>
-        {routeData.map((route) => (
+        {routes?.map((route) => (
           <SelectionCard
-            key={route.id}
-            primaryText={route.name}
-            secondaryText={route.description}
-            isSelected={selectedRouteId === route.id}
+            key={route.routeId}
+            primaryText={route.routeName}
+            secondaryText={route.description || 'Route'}
+            isSelected={selectedRouteId === route.routeId} // selected ONLY after tap
             isDisabled={false}
-            onPress={() => setSelectedRouteId(route.id)}
+            onPress={() => setSelectedRouteId(route.routeId)}
           />
         ))}
       </ScrollView>
-      
-      <TouchableOpacity 
-        style={[styles.confirmButton, !selectedRouteId && styles.disabledButton]}
+
+      <TouchableOpacity
+        style={[
+          styles.confirmButton,
+          !selectedRouteId && styles.disabledButton
+        ]}
         disabled={!selectedRouteId}
-        // 👇 FIX: Change '/chat' to the correct driver flow path
         onPress={() => router.push('/(driver)/confirm-live')}
       >
         <Text style={styles.confirmButtonText}>CONFIRM SELECTION</Text>
@@ -53,6 +104,33 @@ const RouteSelectScreen = () => {
 const styles = StyleSheet.create({
   list: {
     paddingVertical: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#e74c3c',
+    marginBottom: 10,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: COLORS.text,
+    textAlign: 'center',
   },
   confirmButton: {
     backgroundColor: COLORS.primary,

@@ -1,11 +1,12 @@
 // app/(student)/signup.tsx (Student Sign Up Screen - FINAL AUTOSUGGEST VERSION)
 
 import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Keyboard, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import Header from '../../components/Header';
+import { useSignupStudent } from '../../src/api/hooks/useAuth';
 
 // --- DUMMY DATA ---
 const SCHOOLS = ['KNUST', 'University of Ghana', 'GIMPA', 'Academic City University College', 'Ashesi University', 'Kwame Nkrumah University of Science and Technology', 'Central University', 'Accra Technical University'];
@@ -19,6 +20,7 @@ const STUDENT_EMAIL_DOMAIN = /@(st\.)?knust\.edu\.gh|@ug\.edu\.gh|@gimpa\.edu\.g
 
 const StudentSignUpScreen = () => {
     const router = useRouter();
+    const { signupStudent, isLoading: apiLoading, error: apiError } = useSignupStudent();
     
     // --- Form State Management ---
     const [firstName, setFirstName] = useState('');
@@ -30,7 +32,6 @@ const StudentSignUpScreen = () => {
     const [password, setPassword] = useState('');
     
     // --- UI/Validation State ---
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isSchoolListVisible, setIsSchoolListVisible] = useState(false);
 
@@ -76,32 +77,47 @@ const StudentSignUpScreen = () => {
             return;
         }
 
-        setIsLoading(true);
         setError('');
 
         try {
-            // MOCK FOR DEVELOPMENT
-            await new Promise(resolve => setTimeout(resolve, 1500)); 
-            router.replace('/(student)/verify-email');
-        } catch {
-            setError('Could not connect to the server.');
-        } finally {
-            setIsLoading(false);
+            await signupStudent({
+                firstName,
+                lastName,
+                username,
+                schoolName: school,
+                studentIdNumber: studentId,
+                email: studentEmail,
+                password,
+            });
+
+            Alert.alert('Success', 'Account created! Redirecting to email verification...', [
+                { text: 'OK', onPress: () => router.replace('/(student)/verify-email') }
+            ]);
+        } catch (err: any) {
+            setError(apiError || 'Failed to sign up. Please try again.');
+            console.error('Signup error:', err);
         }
     };
     
     return (
-        <View style={COMMON_STYLES.container}>
-            {/* We wrap the entire content in a TouchableOpacity to handle closing the dropdown on outside tap */}
-            <TouchableOpacity 
-                activeOpacity={1}
-                style={{ flex: 1 }}
-                onPress={() => isSchoolListVisible && setIsSchoolListVisible(false)}
-            >
-                <Header title="Sign Up" showBack={true} showMenu={false} />
-                
-                <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-                    <Text style={styles.headerText}>Create your account and shuttle smart today!</Text>
+        <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={COMMON_STYLES.container}
+        >
+            <View style={COMMON_STYLES.container}>
+                {/* We wrap the entire content in a TouchableOpacity to handle closing the dropdown on outside tap */}
+                <TouchableOpacity 
+                    activeOpacity={1}
+                    style={{ flex: 1 }}
+                    onPress={() => isSchoolListVisible && setIsSchoolListVisible(false)}
+                >
+                    <Header title="Sign Up" showBack={true} showMenu={false} />
+                    
+                    <ScrollView 
+                        contentContainerStyle={styles.scrollContainer} 
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
                     
                     {/* --- Input Fields --- */}
                     
@@ -145,22 +161,18 @@ const StudentSignUpScreen = () => {
                     {/* Autocomplete Dropdown List */}
                     {isSchoolListVisible && (
                         <View style={styles.dropdownList}>
-                            <FlatList
-                                data={filteredSchools}
-                                keyExtractor={(item) => item}
-                                renderItem={({ item }) => (
-                                    <TouchableOpacity 
-                                        style={styles.schoolItem}
-                                        onPress={() => handleSchoolSelect(item)}
-                                    >
-                                        <Text style={styles.schoolItemText}>{item}</Text>
-                                    </TouchableOpacity>
-                                )}
-                                ListEmptyComponent={() => (
-                                    <Text style={styles.emptyListText}>No school matches &apos;{school}&apos;</Text>
-                                )}
-                                scrollEnabled={true}
-                            />
+                            {filteredSchools.map((item) => (
+                                <TouchableOpacity 
+                                    key={item}
+                                    style={styles.schoolItem}
+                                    onPress={() => handleSchoolSelect(item)}
+                                >
+                                    <Text style={styles.schoolItemText}>{item}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            {filteredSchools.length === 0 && (
+                                <Text style={styles.emptyListText}>No school matches &apos;{school}&apos;</Text>
+                            )}
                         </View>
                     )}
                     {/* ----------------------------------- */}
@@ -194,11 +206,11 @@ const StudentSignUpScreen = () => {
 
                     {/* Sign Up Button */}
                     <TouchableOpacity 
-                        style={[styles.primaryButton, (!isFormValid || isLoading) && styles.disabledButton]}
+                        style={[styles.primaryButton, (!isFormValid || apiLoading) && styles.disabledButton]}
                         onPress={handleSignUp}
-                        disabled={!isFormValid || isLoading}
+                        disabled={!isFormValid || apiLoading}
                     >
-                        {isLoading ? (
+                        {apiLoading ? (
                             <ActivityIndicator color={COLORS.secondary} />
                         ) : (
                             <Text style={styles.primaryButtonText}>Sign Up</Text>
@@ -215,21 +227,16 @@ const StudentSignUpScreen = () => {
                     
                     <View style={{ height: 40 }} />
                 </ScrollView>
-            </TouchableOpacity>
-        </View>
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     scrollContainer: {
         paddingHorizontal: 20,
-        paddingBottom: 20,
-    },
-    headerText: {
-        fontSize: 16,
-        color: COLORS.text,
-        marginBottom: 20,
-        marginTop: 10,
+        paddingBottom: 80,
     },
     label: {
         fontSize: 14,

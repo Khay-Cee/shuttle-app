@@ -10,7 +10,8 @@ import { LocationBroadcastDto, ShuttleLocationDto } from '../types/api';
 
 // Get API base URL from environment
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8080';
-const WS_ENDPOINT = `${API_BASE_URL}/ws`;
+// Backend exposes SockJS/STOMP at /ws-stomp
+const WS_ENDPOINT = `${API_BASE_URL}/ws-stomp`;
 
 /**
  * STOMP Client wrapper for shuttle location tracking
@@ -40,6 +41,7 @@ export class ShuttleLocationClient {
           // Connection headers with Authorization
           connectHeaders: {
             Authorization: accessToken ? `Bearer ${accessToken}` : '',
+            access_token: accessToken || '',
           },
 
           // Heartbeat intervals (ms)

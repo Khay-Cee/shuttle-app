@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import LiveMap from '../../components/LiveMap';
-import { COLORS } from '../constants/Styles';
+import { COLORS } from '../../constants/Styles';
 import SessionEndModal from '../../components/SessionEndModal';
 import { Ionicons } from '@expo/vector-icons';
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import { COLORS } from '../app/constants/Styles';
+import { COLORS } from '../constants/Styles';
 
 const TypingIndicator = () => {
   return (

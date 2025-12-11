@@ -1,7 +1,7 @@
 // components/LiveMap.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../app/constants/Styles';
+import { COLORS } from '../constants/Styles';
 
 const LiveMap = () => {
   // Show placeholder for both web and mobile for now

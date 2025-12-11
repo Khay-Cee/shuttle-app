@@ -3,7 +3,7 @@
  * Provides typed hooks for shuttles, routes, ETA, and schools
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import apiClient, { handleApiError } from '../axios';
 import { 
   ShuttleDto,
@@ -20,6 +20,82 @@ interface UseApiState<T> {
   data: T | null;
   isLoading: boolean;
   error: string | null;
+}
+
+/**
+ * Hook for fetching all available shuttles for driver's school
+ * Automatically fetches on mount
+ * Usage:
+ * const { shuttles, isLoading, error } = useGetShuttles();
+ */
+export function useGetShuttles() {
+  const [state, setState] = useState<UseApiState<ShuttleDto[]>>({
+    data: null,
+    isLoading: false,
+    error: null,
+  });
+
+  useEffect(() => {
+    const fetchShuttles = async () => {
+      setState({ data: null, isLoading: true, error: null });
+      
+      try {
+        const response = await apiClient.get<ApiResponse<ShuttleDto[]>>(
+          '/driver/shuttles'
+        );
+
+        const data = (response.data as ApiResponse<ShuttleDto[]>)?.data || response.data;
+        
+        setState({ data, isLoading: false, error: null });
+      } catch (error) {
+        const errorMessage = handleApiError(error);
+        setState({ data: null, isLoading: false, error: errorMessage });
+        console.error('Error fetching shuttles:', error);
+      }
+    };
+
+    fetchShuttles();
+  }, []);
+
+  return { shuttles: state.data || [], isLoading: state.isLoading, error: state.error };
+}
+
+/**
+ * Hook for fetching routes for driver's school
+ * Automatically fetches on mount
+ * Usage:
+ * const { routes, isLoading, error } = useGetRoutes();
+ */
+export function useGetRoutes() {
+  const [state, setState] = useState<UseApiState<RouteDto[]>>({
+    data: null,
+    isLoading: false,
+    error: null,
+  });
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      setState({ data: null, isLoading: true, error: null });
+      
+      try {
+        const response = await apiClient.get<ApiResponse<RouteDto[]>>(
+          '/driver/routes'
+        );
+
+        const data = (response.data as ApiResponse<RouteDto[]>)?.data || response.data;
+        
+        setState({ data, isLoading: false, error: null });
+      } catch (error) {
+        const errorMessage = handleApiError(error);
+        setState({ data: null, isLoading: false, error: errorMessage });
+        console.error('Error fetching routes:', error);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
+
+  return { routes: state.data || [], isLoading: state.isLoading, error: state.error };
 }
 
 /**

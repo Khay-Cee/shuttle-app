@@ -3,7 +3,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, COMMON_STYLES } from './constants/Styles';
+import { COLORS, COMMON_STYLES } from '../constants/Styles';
 
 const RoleSelectionScreen = () => {
   const router = useRouter();
@@ -17,7 +17,6 @@ const RoleSelectionScreen = () => {
       />
 
       <View style={styles.footer}>
-        <Text style={styles.promptText}>Ready to shuttle smart?</Text>
         
         {/* Primary Button: Driver */}
         <TouchableOpacity 
@@ -50,11 +49,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: 'center',
     justifyContent: 'flex-end', // Pushes buttons to the bottom
-  },
-  promptText: {
-    fontSize: 16,
-    color: COLORS.text,
-    marginBottom: 20,
   },
   primaryButton: {
     width: '100%',
