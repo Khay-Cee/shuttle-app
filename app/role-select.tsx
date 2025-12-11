@@ -1,8 +1,8 @@
 // app/role-select.tsx
 
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS, COMMON_STYLES } from '../constants/Styles';
 
 const RoleSelectionScreen = () => {
@@ -10,6 +10,11 @@ const RoleSelectionScreen = () => {
 
   return (
     <View style={COMMON_STYLES.container}>
+      <Image 
+        source={require('../assets/logo2.png')}  
+        style={styles.logo}
+      />
+
       {/* Full-screen Image based on Figma */}
       <Image 
         source={require('../assets/bus_interior.jpg')} 
@@ -39,10 +44,18 @@ const RoleSelectionScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 350,
+    height: 150,
+    resizeMode: 'contain',
+    marginBottom: 20,
+    alignItems: 'center',
+  },
   busImage: {
     width: '100%',
-    height: '70%',
+    height: '50%',
     resizeMode: 'cover',
+    borderRadius: 15, 
   },
   footer: {
     flex: 1,
