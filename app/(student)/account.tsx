@@ -1,11 +1,10 @@
 // app/(student)/account.tsx (Main Profile/Account Screen)
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import Header from '../../components/Header';
+import LogoutSuccessModal from '../../components/LogoutSuccessModal';
+import { COLORS, COMMON_STYLES } from '../constants/Styles';
 
 // --- MOCK DATA ---
 const MOCK_USER = {
@@ -37,6 +36,7 @@ const AccountScreen = () => {
     const router = useRouter();
     const [isLoggedOut, setIsLoggedOut] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const handleLogout = () => {
         setShowLogoutModal(true);
@@ -44,8 +44,11 @@ const AccountScreen = () => {
 
     const confirmLogout = () => {
         setShowLogoutModal(false);
-        setIsLoggedOut(true);
+        setShowSuccessModal(true);
+        
         setTimeout(() => {
+            setShowSuccessModal(false);
+            setIsLoggedOut(true);
             router.replace('/role-select');
         }, 1500);
     };
@@ -56,8 +59,8 @@ const AccountScreen = () => {
 
     return (
         <View style={COMMON_STYLES.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <Header title="My Account" showBack={true} showMenu={false} />
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                <Header title="My Account" showBack={false} showMenu={false} />
                 
                 {/* Profile Summary Card */}
                 <View style={styles.profileCard}>
@@ -88,7 +91,7 @@ const AccountScreen = () => {
                     />
                 </View>
 
-                {/* Support & Logout Section */}
+                {/* Support Section */}
                 <Text style={styles.sectionHeader}>Other</Text>
                 <View style={styles.settingsGroup}>
                     <SettingsItem 
@@ -96,13 +99,16 @@ const AccountScreen = () => {
                         title="Help & Support" 
                         onPress={() => Alert.alert("Support", "Contact support@shuttlesmart.com")} 
                     />
-                    <SettingsItem 
-                        icon="log-out-outline" 
-                        title="Log Out" 
-                        onPress={handleLogout} 
-                        isDestructive 
-                    />
                 </View>
+
+                {/* Log Out Button */}
+                <TouchableOpacity 
+                    style={styles.logoutButton}
+                    onPress={handleLogout}
+                >
+                    <Ionicons name="log-out-outline" size={24} color="#CC0000" style={{ marginRight: 10 }} />
+                    <Text style={styles.logoutButtonText}>Log Out</Text>
+                </TouchableOpacity>
 
                 {/* Logged Out Message (for visual feedback before navigation) */}
                 {isLoggedOut && (
@@ -143,6 +149,9 @@ const AccountScreen = () => {
                     </View>
                 </TouchableOpacity>
             </Modal>
+
+            {/* Logout Success Modal */}
+            <LogoutSuccessModal isVisible={showSuccessModal} />
 
             {/* Bottom Navigation */}
             <View style={styles.bottomNav}>
@@ -234,17 +243,34 @@ const styles = StyleSheet.create({
         color: COLORS.text,
         marginLeft: 15,
     },
-    loggedOutMessage: {
+    logoutButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 20,
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        backgroundColor: '#FFEBEE',
+        backgroundColor: '#FCE9E9',
+        padding: 15,
         borderRadius: 8,
+        marginTop: 20,
         borderWidth: 1,
-        borderColor: '#EF5350',
+        borderColor: '#CC0000',
+    },
+    logoutButtonText: {
+        color: '#CC0000',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    loggedOutMessage: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.secondary,
+        padding: 15,
+        borderRadius: 8,
+        marginTop: 20,
+        borderLeftWidth: 4,
+        borderLeftColor: '#4CAF50',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
     },
     // --- Modal Styles ---
     modalOverlay: {

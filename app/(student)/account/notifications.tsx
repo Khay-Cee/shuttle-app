@@ -1,7 +1,5 @@
 // app/(student)/account/notifications.tsx (Notification Settings Screen)
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, COMMON_STYLES } from '../../../constants/Styles';
@@ -61,13 +59,7 @@ const NotificationScreen = () => {
 
     return (
         <View style={COMMON_STYLES.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Notifications</Text>
-                <View style={{ width: 40 }} /> 
-            </View>
+            <Header title="Notifications" showBack={false} showMenu={false} />
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 
@@ -114,7 +106,7 @@ const NotificationScreen = () => {
             </ScrollView>
 
             {/* Save Button */}
-            <View style={styles.saveContainer}>
+            <View>
                 <TouchableOpacity
                     style={[styles.saveButton, isSaving && styles.disabledButton]}
                     onPress={handleSaveChanges}
@@ -195,12 +187,6 @@ const styles = StyleSheet.create({
         marginLeft: 15,
     },
     // --- Save Button ---
-    saveContainer: {
-        padding: 20,
-        backgroundColor: 'white',
-        borderTopWidth: 1,
-        borderTopColor: COLORS.border,
-    },
     saveButton: {
         backgroundColor: COLORS.primary,
         borderRadius: 10,

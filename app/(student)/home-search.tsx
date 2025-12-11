@@ -1,8 +1,5 @@
 // app/(student)/home-search.tsx (Student Home Map & Search Screen - Web Fix Applied)
 
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, SafeAreaView, Keyboard, FlatList, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import Header from '../../components/Header';
@@ -75,20 +72,16 @@ const SearchInput: React.FC<SearchInputProps> = ({
             {/* Autocomplete List */}
             {isFocused && filteredStops.length > 0 && (
                 <View style={styles.autocompleteList}>
-                    <FlatList
-                        data={filteredStops.slice(0, 5)} // Limit to 5 suggestions
-                        keyExtractor={(item) => item}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity 
-                                style={styles.autocompleteItem}
-                                onPress={() => onSelection(item)}
-                            >
-                                <Ionicons name="location-outline" size={18} color={COLORS.text} style={{ marginRight: 10 }} />
-                                <Text style={styles.autocompleteText}>{item}</Text>
-                            </TouchableOpacity>
-                        )}
-                        keyboardShouldPersistTaps="always" // Important for usability
-                    />
+                    {filteredStops.slice(0, 5).map((item) => (
+                        <TouchableOpacity 
+                            key={item}
+                            style={styles.autocompleteItem}
+                            onPress={() => onSelection(item)}
+                        >
+                            <Ionicons name="location-outline" size={18} color={COLORS.text} style={{ marginRight: 10 }} />
+                            <Text style={styles.autocompleteText}>{item}</Text>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             )}
         </View>
@@ -102,6 +95,21 @@ const HomeSearchScreen = () => {
     const [pickupStop, setPickupStop] = useState('');
     const [destinationStop, setDestinationStop] = useState('');
     const [focusedInput, setFocusedInput] = useState<'pickup' | 'destination' | null>(null);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+    useEffect(() => {
+        const showSub = Keyboard.addListener('keyboardDidShow', (event) => {
+            setKeyboardOffset(event.endCoordinates.height);
+        });
+        const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardOffset(0);
+        });
+
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
 
     const isFormComplete = pickupStop && destinationStop;
 
@@ -118,16 +126,21 @@ const HomeSearchScreen = () => {
         }
     };
 
-    // Handler for selecting a suggestion in the autocomplete list
+    // Handler for selecting a suggestion in the autocomplete list - FIXED
     const handleSelection = (stop: string) => {
+        // Update the value FIRST
         if (focusedInput === 'pickup') {
             setPickupStop(stop);
         } else if (focusedInput === 'destination') {
             setDestinationStop(stop);
         }
-        setFocusedInput(null); // Blur the input after selection
+        
+        // THEN close the dropdown and dismiss keyboard
+        setFocusedInput(null);
         Keyboard.dismiss();
     };
+
+    const searchCardBottom = keyboardOffset > 0 ? keyboardOffset + 10 : 70;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -175,7 +188,7 @@ const HomeSearchScreen = () => {
 
 
             {/* Bottom Search Interface (Floating Card) */}
-            <View style={styles.searchCard}>
+            <View style={[styles.searchCard, { bottom: searchCardBottom }]}>
                 <ScrollView keyboardShouldPersistTaps="handled">
                     
                     {/* Pick-Up Stop Search */}
@@ -408,4 +421,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HomeSearchScreen;
+export default HomeSearchScreen

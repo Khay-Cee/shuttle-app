@@ -1,7 +1,5 @@
 // app/(student)/account/personal-info.tsx (Personal Information Edit Screen)
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, COMMON_STYLES } from '../../../constants/Styles';
@@ -55,13 +53,7 @@ const PersonalInfoScreen = () => {
             style={COMMON_STYLES.container} 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Personal Information</Text>
-                <View style={{ width: 40 }} />
-            </View>
+            <Header title="Personal Information" showBack={false} showMenu={false} />
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 

@@ -1,8 +1,5 @@
 // app/(student)/available-shuttles.tsx (Available Shuttles List)
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/Styles';
 
@@ -64,7 +61,6 @@ const AvailableShuttlesScreen = () => {
 
     const [shuttles, setShuttles] = useState<Shuttle[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
 
     // --- Mock Data Fetching (Replace with API call later) ---
     useEffect(() => {
@@ -73,7 +69,6 @@ const AvailableShuttlesScreen = () => {
         
         const fetchShuttles = async () => {
             setIsLoading(true);
-            setError('');
             await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
             
             // For now, we display all mock shuttles regardless of destination
@@ -103,45 +98,37 @@ const AvailableShuttlesScreen = () => {
 
     return (
         <View style={styles.container}>
-            
-            {/* Header and Back Button */}
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Available Shuttles</Text>
-                    {/* Placeholder for menu or close icon */}
-                    <View style={{ width: 50 }} /> 
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* Header consistent with Login screen */}
+                <Header title="Available" showBack={false} showMenu={false} />
+
+                {/* Destination Tag */}
+                <View style={styles.destinationTag}>
+                    <Ionicons name="location-outline" size={18} color={COLORS.text} />
+                    <Text style={styles.destinationText}>{destination}</Text>
                 </View>
-            </View>
 
-            {/* Destination Tag */}
-            <View style={styles.destinationTag}>
-                <Ionicons name="location-outline" size={18} color={COLORS.text} />
-                <Text style={styles.destinationText}>{destination}</Text>
-            </View>
-
-            {isLoading ? (
-                <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 50 }} />
-            ) : shuttles.length === 0 ? (
-                <Text style={styles.emptyText}>No shuttles found for this route right now.</Text>
-            ) : (
-                <ScrollView contentContainerStyle={styles.listContainer}>
-                    {shuttles.map(shuttle => (
-                        <ShuttleCard 
-                            key={shuttle.id} 
-                            shuttle={shuttle} 
-                            onSelect={handleSelectShuttle} 
-                        />
-                    ))}
-                    <Text style={styles.tipText}>Tap any shuttle to set a reminder!</Text>
-                </ScrollView>
-            )}
+                {isLoading ? (
+                    <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 50 }} />
+                ) : shuttles.length === 0 ? (
+                    <Text style={styles.emptyText}>No shuttles found for this route right now.</Text>
+                ) : (
+                    <View style={styles.listContainer}>
+                        {shuttles.map(shuttle => (
+                            <ShuttleCard 
+                                key={shuttle.id} 
+                                shuttle={shuttle} 
+                                onSelect={handleSelectShuttle} 
+                            />
+                        ))}
+                        <Text style={styles.tipText}>Tap any shuttle to set a reminder!</Text>
+                    </View>
+                )}
+            </ScrollView>
 
             {/* Bottom Navigation (as per design) */}
             <View style={styles.bottomNav}>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => router.push('/(student)/home-search')}>
                     <Ionicons name="home" size={24} color={COLORS.primary} />
                     <Text style={[styles.navText, { color: COLORS.primary }]}>Home</Text>
                 </TouchableOpacity>
@@ -162,6 +149,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
+    },
+    scrollContent: {
+        paddingBottom: 100, // keep content clear of bottom nav
     },
     header: {
         paddingTop: 0,

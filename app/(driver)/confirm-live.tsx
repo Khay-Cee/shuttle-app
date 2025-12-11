@@ -39,7 +39,7 @@ const ConfirmLiveScreen = () => {
     <View style={COMMON_STYLES.container}>
       <Header 
         title="Confirm & Go Live" 
-        showBack={true} 
+        showBack={false} 
         progress={{ currentStep: 3, totalSteps: 3 }} // Step 3 of 3
       />
 
