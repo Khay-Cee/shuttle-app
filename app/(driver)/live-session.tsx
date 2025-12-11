@@ -1,12 +1,12 @@
 // app/(driver)/live-session.tsx
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useRouter } from 'expo-router';
-import LiveMap from '../../components/LiveMap';
-import { COLORS } from '../constants/Styles';
-import SessionEndModal from '../../components/SessionEndModal';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import LiveMap from '../../components/LiveMap';
+import SessionEndModal from '../../components/SessionEndModal';
+import { COLORS } from '../constants/Styles';
 
 const LiveSessionScreen = () => {
   const router = useRouter();
@@ -22,12 +22,21 @@ const LiveSessionScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Map View */}
-      <LiveMap />
+      {/* Map View - CONDITIONAL RENDERING FIX */}
+      {Platform.OS === 'web' ? (
+        // Fallback view for web environment
+        <View style={styles.mapFallback}>
+          <Ionicons name="map-outline" size={50} color={COLORS.border} />
+          <Text style={styles.mapFallbackText}>Map View Disabled on Web Preview</Text>
+          <Text style={styles.mapFallbackTextSmall}>(Please run on iOS/Android emulator or device)</Text>
+        </View>
+      ) : (
+        <LiveMap />
+      )}
 
       {/* Top Header Controls */}
       <View style={styles.header}>
-        <Image source={require('../../assets/logo.png')} style={styles.logo} />
+        <Image source={require('../../assets/logo1.png')} style={styles.logo} />
         <TouchableOpacity onPress={() => router.push('/(driver)/account')}>
           <Ionicons name="menu" size={30} color={COLORS.text} />
         </TouchableOpacity>
@@ -56,6 +65,23 @@ const LiveSessionScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  mapFallback: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+  },
+  mapFallbackText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginTop: 15,
+  },
+  mapFallbackTextSmall: {
+    fontSize: 12,
+    color: COLORS.textFaded,
+    marginTop: 5,
   },
   header: {
     position: 'absolute',

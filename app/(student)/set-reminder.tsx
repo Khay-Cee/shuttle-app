@@ -1,9 +1,10 @@
 // app/(student)/set-reminder.tsx (Set Reminder Screen)
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Header from '../../components/Header';
 import { COLORS } from '../constants/Styles';
 
 type MapModule = typeof import('react-native-maps') | null;
@@ -50,30 +51,22 @@ const SetReminderScreen = () => {
     const destination = params.destination as string;
     const etaMinutes = parseInt(params.etaMinutes as string) || 99; // Default to high ETA if missing
 
-    // State for the selected reminder time
-    const [selectedReminderTime, setSelectedReminderTime] = useState(5); // Default to 5 mins
+    const [selectedReminderTime, setSelectedReminderTime] = useState(5);
 
-
-    // Validation for Proceed button
     const isReminderValid = useMemo(() => {
-        // A reminder must be selected and must be less than the ETA
         return selectedReminderTime > 0 && selectedReminderTime < etaMinutes;
     }, [selectedReminderTime, etaMinutes]);
 
-
-    // Handler for proceeding to the tracking screen
     const handleProceed = () => {
         if (!isReminderValid) {
             Alert.alert(
-                "Invalid Reminder Time",
+                'Invalid Reminder Time',
                 `The selected reminder time (${selectedReminderTime} min) must be less than the shuttle's ETA (${etaMinutes} min). Please select a closer time.`,
-                [{ text: "OK" }]
+                [{ text: 'OK' }]
             );
             return;
         }
 
-        // --- Core Action: Set Reminder and Navigate to Activity Page ---
-        // Pass the new trip details to the Activity page
         router.replace({
             pathname: '/(student)/activity',
             params: {
@@ -82,96 +75,90 @@ const SetReminderScreen = () => {
                     route,
                     destination,
                     reminderTime: selectedReminderTime.toString(),
-                    date: new Date().toISOString(), // Use current time for mock trip date
+                    date: new Date().toISOString(),
                 }),
-            }
+            },
         });
     };
 
     return (
         <View style={styles.container}>
-            
-            {/* ⚠️ Map View Placeholder/Fallback for Web (Similar to home-search) */}
-            <View style={styles.mapContainer}>
-                {Platform.OS === 'web' || !mapModule ? (
-                    <View style={styles.mapFallback}>
-                        <Ionicons name="map-outline" size={30} color={COLORS.text} />
-                        <Text style={styles.mapFallbackText}>Live Map View</Text>
-                    </View>
-                ) : (
-                    // On Native, use MapView (can be simplified to just a static map showing the route)
-                    <mapModule.default style={styles.map} initialRegion={{ latitude: 6.67, longitude: -1.57, latitudeDelta: 0.05, longitudeDelta: 0.05 }} />
-                )}
-            </View>
-
-            {/* Content Card (Set Reminder) */}
-            <ScrollView contentContainerStyle={styles.contentCard}>
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-                    </TouchableOpacity>
-                    <Text style={styles.screenTitle}>Set Reminder</Text>
-                    <View style={{ width: 40 }} />
-                </View>
-
-                {/* Shuttle Information Card */}
-                <View style={styles.shuttleInfoCard}>
-                    <View style={styles.infoRow}>
-                        <Ionicons name="bus" size={24} color="black" />
-                        <View style={styles.infoDetails}>
-                            <Text style={styles.routeText}>{route} <Text style={styles.busNumberText}>Bus {busNumber}</Text></Text>
-                            <Text style={styles.currentLocationText}>Currently at: {currentLocation}</Text>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* ⚠️ Map View Placeholder/Fallback for Web (Similar to home-search) */}
+                <View style={styles.mapContainer}>
+                    {Platform.OS === 'web' || !mapModule ? (
+                        <View style={styles.mapFallback}>
+                            <Ionicons name="map-outline" size={30} color={COLORS.text} />
+                            <Text style={styles.mapFallbackText}>Live Map View</Text>
                         </View>
-                        <View style={styles.etaBadge}>
-                            <Text style={styles.etaText}>{etaMinutes}</Text>
-                            <Text style={styles.etaUnit}>mins</Text>
+                    ) : (
+                        // On Native, use MapView (can be simplified to just a static map showing the route)
+                        <mapModule.default style={styles.map} initialRegion={{ latitude: 6.67, longitude: -1.57, latitudeDelta: 0.05, longitudeDelta: 0.05 }} />
+                    )}
+                </View>
+
+                {/* Content Card (Set Reminder) */}
+                <View style={styles.contentCard}>
+                    <Header title="Set Reminder" showBack={true} showMenu={false} />
+
+                    {/* Shuttle Information Card */}
+                    <View style={styles.shuttleInfoCard}>
+                        <View style={styles.infoRow}>
+                            <Ionicons name="bus" size={24} color="black" />
+                            <View style={styles.infoDetails}>
+                                <Text style={styles.routeText}>{route} <Text style={styles.busNumberText}>Bus {busNumber}</Text></Text>
+                                <Text style={styles.currentLocationText}>Currently at: {currentLocation}</Text>
+                            </View>
+                            <View style={styles.etaBadge}>
+                                <Text style={styles.etaText}>{etaMinutes}</Text>
+                                <Text style={styles.etaUnit}>mins</Text>
+                            </View>
+                        </View>
+                        <View style={styles.locationDetailRow}>
+                            <Ionicons name="pin" size={16} color={COLORS.primary} style={{ marginRight: 8 }} />
+                            <Text style={styles.locationDetailText}>Going to: {destination}</Text>
                         </View>
                     </View>
-                    <View style={styles.locationDetailRow}>
-                        <Ionicons name="pin" size={16} color={COLORS.primary} style={{ marginRight: 8 }} />
-                        <Text style={styles.locationDetailText}>Going to: {destination}</Text>
+
+                    {/* Reminder Options */}
+                    <Text style={styles.reminderHeader}>Remind me before arrival</Text>
+                    <View style={styles.reminderOptionsContainer}>
+                        {REMINDER_OPTIONS.map(time => (
+                            <ReminderButton
+                                key={time}
+                                time={time}
+                                isSelected={selectedReminderTime === time}
+                                onPress={() => setSelectedReminderTime(time)}
+                            />
+                        ))}
                     </View>
-                </View>
 
-                {/* Reminder Options */}
-                <Text style={styles.reminderHeader}>Remind me before arrival</Text>
-                <View style={styles.reminderOptionsContainer}>
-                    {REMINDER_OPTIONS.map(time => (
-                        <ReminderButton
-                            key={time}
-                            time={time}
-                            isSelected={selectedReminderTime === time}
-                            onPress={() => setSelectedReminderTime(time)}
-                        />
-                    ))}
-                </View>
-
-                {/* Reminder Notification Preview */}
-                <View style={styles.notificationBox}>
-                    <Ionicons name="notifications-outline" size={24} color={COLORS.primary} />
-                    <View style={styles.notificationTextContainer}>
-                        <Text style={styles.notificationTitle}>Reminder Notification</Text>
-                        <Text style={styles.notificationBody}>
-                            You will receive a notification {selectedReminderTime} minutes before the shuttle arrives at {destination}.
-                        </Text>
-                        {/* Validation warning */}
-                        {!isReminderValid && (
-                            <Text style={styles.validationWarning}>
-                                ⚠️ Cannot set a reminder time greater than or equal to the ETA ({etaMinutes} mins).
+                    {/* Reminder Notification Preview */}
+                    <View style={styles.notificationBox}>
+                        <Ionicons name="notifications-outline" size={24} color={COLORS.primary} />
+                        <View style={styles.notificationTextContainer}>
+                            <Text style={styles.notificationTitle}>Reminder Notification</Text>
+                            <Text style={styles.notificationBody}>
+                                {`You will receive a notification ${selectedReminderTime} minutes before the shuttle arrives at ${destination}.`}
                             </Text>
-                        )}
+                            {/* Validation warning */}
+                            {!isReminderValid && (
+                                <Text style={styles.validationWarning}>
+                                    ⚠️ Cannot set a reminder time greater than or equal to the ETA ({etaMinutes} mins).
+                                </Text>
+                            )}
+                        </View>
                     </View>
+
+                    {/* Proceed Button */}
+                    <TouchableOpacity
+                        style={[styles.proceedButton, !isReminderValid && styles.disabledButton]}
+                        onPress={handleProceed}
+                        disabled={!isReminderValid}
+                    >
+                        <Text style={styles.proceedButtonText}>Proceed</Text>
+                    </TouchableOpacity>
                 </View>
-
-                {/* Proceed Button */}
-                <TouchableOpacity
-                    style={[styles.proceedButton, !isReminderValid && styles.disabledButton]}
-                    onPress={handleProceed}
-                    disabled={!isReminderValid}
-                >
-                    <Text style={styles.proceedButtonText}>Proceed</Text>
-                </TouchableOpacity>
-
             </ScrollView>
 
             {/* Bottom Navigation */}
@@ -190,6 +177,7 @@ const SetReminderScreen = () => {
                 </TouchableOpacity>
             </View>
         </View>
+
     );
 };
 
@@ -197,6 +185,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
+    },
+    scrollContent: {
+        paddingBottom: 300,
     },
     mapContainer: {
         height: '40%', // Take up the top part of the screen
@@ -225,25 +216,6 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         marginTop: -30, // Overlap the map area slightly
         paddingBottom: 80, // Space for the bottom nav
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-        gap: 5,
-        paddingTop: 25,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    screenTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: COLORS.text,
     },
     // --- Shuttle Info Card ---
     shuttleInfoCard: {

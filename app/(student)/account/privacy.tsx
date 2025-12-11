@@ -1,9 +1,10 @@
 // app/(student)/account/privacy.tsx (Privacy Settings Screen)
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Switch } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import Header from '../../../components/Header';
 import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 
 // --- MOCK DATA ---
@@ -66,13 +67,7 @@ const PrivacyScreen = () => {
 
     return (
         <View style={COMMON_STYLES.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Privacy</Text>
-                <View style={{ width: 40 }} /> 
-            </View>
+            <Header title="Privacy" showBack={false} showMenu={false} />
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.settingsGroup}>
@@ -101,7 +96,7 @@ const PrivacyScreen = () => {
             </ScrollView>
 
             {/* Save Button */}
-            <View style={styles.saveContainer}>
+            <View>
                 <TouchableOpacity
                     style={[styles.saveButton, isSaving && styles.disabledButton]}
                     onPress={handleSaveChanges}
@@ -179,6 +174,7 @@ const styles = StyleSheet.create({
         marginLeft: 60, // Align with text container
     },
     // --- Save Button ---
+    
     saveButton: {
         backgroundColor: COLORS.primary,
         borderRadius: 10,

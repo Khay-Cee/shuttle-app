@@ -12,7 +12,7 @@ const SignUpScreen = () => {
   return (
     <View style={COMMON_STYLES.container}>
       {/* Reusing the common Header component */}
-      <Header title="Sign Up" showBack={true} showMenu={false} />
+      <Header title="Sign Up" showBack={false} showMenu={false} />
 
       <Text style={styles.prompt}>
         Create your account and shuttle smart today!

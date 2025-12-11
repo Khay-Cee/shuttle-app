@@ -1,12 +1,12 @@
 // app/(driver)/account.tsx
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header'; // We will use this header for the title/back arrow
 import LogoutSuccessModal from '../../components/LogoutSuccessModal'; // NEW Component
+import { COLORS, COMMON_STYLES } from '../constants/Styles';
 
 const DriverAccountScreen = () => {
   const router = useRouter();
@@ -43,9 +43,8 @@ const DriverAccountScreen = () => {
 
   return (
     <View style={COMMON_STYLES.container}>
-      <Header title="Account" showBack={true} showMenu={false} />
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <Header title="Account" showBack={true} showMenu={false} />
         
         {/* Profile Picture Section */}
         <View style={styles.profileContainer}>

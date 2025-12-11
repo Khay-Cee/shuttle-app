@@ -21,7 +21,7 @@ const RouteSelectScreen = () => {
     <View style={COMMON_STYLES.container}>
       <Header 
         title="Select Your Route" 
-        showBack={true} 
+        showBack={false} 
         progress={{ currentStep: 2, totalSteps: 3 }} // Set progress to step 2 of 3
       />
       

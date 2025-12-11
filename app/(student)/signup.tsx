@@ -1,11 +1,11 @@
 // app/(student)/signup.tsx (Student Sign Up Screen - FINAL AUTOSUGGEST VERSION)
 
-import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, Keyboard } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
+import { COLORS, COMMON_STYLES } from '../constants/Styles';
 
 // --- DUMMY DATA ---
 const SCHOOLS = ['KNUST', 'University of Ghana', 'GIMPA', 'Academic City University College', 'Ashesi University', 'Kwame Nkrumah University of Science and Technology', 'Central University', 'Accra Technical University'];
@@ -98,9 +98,8 @@ const StudentSignUpScreen = () => {
                 style={{ flex: 1 }}
                 onPress={() => isSchoolListVisible && setIsSchoolListVisible(false)}
             >
-                <Header title="Sign Up" showBack={true} showMenu={false} />
-                
                 <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+                    <Header title="Sign Up" showBack={false} showMenu={false} />
                     <Text style={styles.headerText}>Create your account and shuttle smart today!</Text>
                     
                     {/* --- Input Fields --- */}
