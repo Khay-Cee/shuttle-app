@@ -1,6 +1,18 @@
 // app/(student)/set-reminder.tsx (Set Reminder Screen)
 
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+    Alert,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Header from '../../components/Header';
 import { COLORS } from '../../constants/Styles';
 
 type MapModule = typeof import('react-native-maps') | null;

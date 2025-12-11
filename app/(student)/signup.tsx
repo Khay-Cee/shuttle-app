@@ -1,11 +1,11 @@
 // app/(student)/signup.tsx (Student Sign Up Screen - FINAL AUTOSUGGEST VERSION)
 
-import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Keyboard, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import { useSignupStudent } from '../../src/api/hooks/useAuth';
 
 // --- DUMMY DATA ---
@@ -111,13 +111,12 @@ const StudentSignUpScreen = () => {
                     style={{ flex: 1 }}
                     onPress={() => isSchoolListVisible && setIsSchoolListVisible(false)}
                 >
-                    <Header title="Sign Up" showBack={true} showMenu={false} />
-                    
                     <ScrollView 
                         contentContainerStyle={styles.scrollContainer} 
                         keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
                     >
+                    <Header title="Sign Up" showBack={false} showMenu={false} />
                     
                     {/* --- Input Fields --- */}
                     
@@ -159,20 +158,26 @@ const StudentSignUpScreen = () => {
                     </View>
 
                     {/* Autocomplete Dropdown List */}
-                    {isSchoolListVisible && (
-                        <View style={styles.dropdownList}>
-                            {filteredSchools.map((item) => (
+                    {isSchoolListVisible && filteredSchools.length > 0 && (
+                        <FlatList
+                            data={filteredSchools}
+                            keyExtractor={(item) => item}
+                            renderItem={({ item }) => (
                                 <TouchableOpacity 
-                                    key={item}
                                     style={styles.schoolItem}
                                     onPress={() => handleSchoolSelect(item)}
                                 >
                                     <Text style={styles.schoolItemText}>{item}</Text>
                                 </TouchableOpacity>
-                            ))}
-                            {filteredSchools.length === 0 && (
-                                <Text style={styles.emptyListText}>No school matches &apos;{school}&apos;</Text>
                             )}
+                            scrollEnabled={false}
+                            nestedScrollEnabled={true}
+                            style={styles.dropdownList}
+                        />
+                    )}
+                    {isSchoolListVisible && filteredSchools.length === 0 && (
+                        <View style={styles.dropdownList}>
+                            <Text style={styles.emptyListText}>No school matches &apos;{school}&apos;</Text>
                         </View>
                     )}
                     {/* ----------------------------------- */}
@@ -284,8 +289,10 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginTop: 5,
         marginBottom: 10,
-        maxHeight: 250,
+        maxHeight: 200,
         paddingVertical: 5,
+        position: 'relative',
+        zIndex: 1000,
     },
     schoolItem: {
         paddingVertical: 10,

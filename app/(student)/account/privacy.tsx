@@ -1,6 +1,18 @@
 // app/(student)/account/privacy.tsx (Privacy Settings Screen)
 
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Header from '../../../components/Header';
 import { COLORS, COMMON_STYLES } from '../../../constants/Styles';
 
 // --- MOCK DATA ---

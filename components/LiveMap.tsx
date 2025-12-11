@@ -1,7 +1,7 @@
 // components/LiveMap.tsx
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { COLORS } from '../constants/Styles';
 
 const INITIAL_REGION = {

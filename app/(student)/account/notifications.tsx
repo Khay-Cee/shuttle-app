@@ -1,8 +1,102 @@
 // app/(student)/account/notifications.tsx (Notification Settings Screen)
 
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import {
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Header from '../../../components/Header';
 import { COLORS, COMMON_STYLES } from '../../../constants/Styles';
+
+// --- Styles Definition (must come before components that use it) ---
+const styles = StyleSheet.create({
+    // --- Header ---
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 50,
+        paddingBottom: 15,
+        backgroundColor: COLORS.secondary,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
+    },
+    backButton: {
+        padding: 5,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: COLORS.text,
+    },
+    // --- Content ---
+    scrollContainer: {
+        paddingVertical: 20,
+    },
+    sectionHeader: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.text,
+        marginTop: 10,
+        marginBottom: 10,
+        paddingLeft: 5,
+    },
+    settingsGroup: {
+        backgroundColor: 'white',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        overflow: 'hidden',
+    },
+    toggleItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 15,
+        paddingHorizontal: 15,
+    },
+    toggleTextContainer: {
+        flex: 1,
+        marginRight: 10,
+    },
+    toggleTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: COLORS.text,
+    },
+    toggleDescription: {
+        fontSize: 14,
+        color: COLORS.textFaded,
+        marginTop: 2,
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#F0F0F0',
+        marginLeft: 15,
+    },
+    // --- Save Button ---
+    saveButton: {
+        backgroundColor: COLORS.primary,
+        borderRadius: 10,
+        padding: 15,
+        alignItems: 'center',
+    },
+    disabledButton: {
+        backgroundColor: COLORS.border,
+        opacity: 0.8,
+    },
+    saveButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+});
 
 // --- MOCK DATA ---
 const INITIAL_SETTINGS = {
@@ -120,88 +214,5 @@ const NotificationScreen = () => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    // --- Header ---
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingTop: 50,
-        paddingBottom: 15,
-        backgroundColor: COLORS.secondary,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
-    },
-    backButton: {
-        padding: 5,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: COLORS.text,
-    },
-    // --- Content ---
-    scrollContainer: {
-        paddingVertical: 20,
-    },
-    sectionHeader: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: COLORS.text,
-        marginTop: 10,
-        marginBottom: 10,
-        paddingLeft: 5,
-    },
-    settingsGroup: {
-        backgroundColor: 'white',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        overflow: 'hidden',
-    },
-    toggleItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 15,
-        paddingHorizontal: 15,
-    },
-    toggleTextContainer: {
-        flex: 1,
-        marginRight: 10,
-    },
-    toggleTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: COLORS.text,
-    },
-    toggleDescription: {
-        fontSize: 14,
-        color: COLORS.textFaded,
-        marginTop: 2,
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#F0F0F0',
-        marginLeft: 15,
-    },
-    // --- Save Button ---
-    saveButton: {
-        backgroundColor: COLORS.primary,
-        borderRadius: 10,
-        padding: 15,
-        alignItems: 'center',
-    },
-    disabledButton: {
-        backgroundColor: COLORS.border,
-        opacity: 0.8,
-    },
-    saveButtonText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-});
 
 export default NotificationScreen;

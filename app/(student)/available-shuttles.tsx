@@ -1,6 +1,17 @@
 // app/(student)/available-shuttles.tsx (Available Shuttles List)
 
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Header from '../../components/Header';
 import { COLORS } from '../../constants/Styles';
 
 // --- MOCK DATA ---
@@ -82,16 +93,26 @@ const AvailableShuttlesScreen = () => {
 
     // --- Selection Handler ---
     const handleSelectShuttle = (shuttle: Shuttle) => {
+        console.log('Shuttle selected:', shuttle);
+        console.log('Navigating to set-reminder with params:', {
+            shuttleId: shuttle.id,
+            route: shuttle.route,
+            busNumber: shuttle.busNumber,
+            currentLocation: shuttle.currentLocation,
+            etaMinutes: shuttle.etaMinutes.toString(),
+            destination: destination,
+        });
+        
         // Navigate to the Set Reminder screen, passing all necessary shuttle data
         router.push({
             pathname: '/(student)/set-reminder',
             params: {
                 shuttleId: shuttle.id,
                 route: shuttle.route,
-                busNumber: shuttle.busNumber,
+                busNumber: shuttle.busNumber.toString(),
                 currentLocation: shuttle.currentLocation,
                 etaMinutes: shuttle.etaMinutes.toString(), // Pass numbers as strings for URL params
-                destination: destination,
+                destination: destination.toString(),
             }
         });
     };

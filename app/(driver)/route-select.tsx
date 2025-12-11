@@ -1,18 +1,18 @@
 // app/(driver)/route-select.tsx
 
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  ActivityIndicator,
   ScrollView,
-  ActivityIndicator
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
-import SelectionCard from '../../components/SelectionCard';
 import Header from '../../components/Header';
+import SelectionCard from '../../components/SelectionCard';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import { useGetRoutes } from '../../src/api/hooks/useShuttle';
 
 const RouteSelectScreen = () => {
@@ -23,6 +23,7 @@ const RouteSelectScreen = () => {
   // Reset selection when routes change
   React.useEffect(() => {
     setSelectedRouteId(null);
+    console.log('Routes loaded:', routes); // Debug log
   }, [routes]);
 
   // ---------------------------
@@ -70,29 +71,38 @@ const RouteSelectScreen = () => {
     <View style={COMMON_STYLES.container}>
       <Header
         title="Select Your Route"
-        showBack={true}
+        showBack={false}
         progress={{ currentStep: 2, totalSteps: 3 }}
       />
 
       <ScrollView contentContainerStyle={styles.list}>
-        {routes?.map((route) => (
-          <SelectionCard
-            key={route.routeId}
-            primaryText={route.routeName}
-            secondaryText={route.description || 'Route'}
-            isSelected={selectedRouteId === route.routeId} // selected ONLY after tap
-            isDisabled={false}
-            onPress={() => setSelectedRouteId(route.routeId)}
-          />
-        ))}
+        {routes?.map((route, index) => {
+          const isSelected = selectedRouteId === route.routeId;
+          const routeKey = route.routeId ?? `route-${index}`; // fallback to avoid duplicate/undefined keys
+          console.log(`Route ${route.routeId} (${route.routeName}): isSelected=${isSelected}, selectedRouteId=${selectedRouteId}`);
+          
+          return (
+            <SelectionCard
+              key={routeKey}
+              primaryText={route.routeName}
+              secondaryText={route.description || 'Route'}
+              isSelected={isSelected} // selected ONLY after tap
+              isDisabled={false}
+              onPress={() => {
+                console.log('Route tapped:', route.routeId);
+                setSelectedRouteId(route.routeId ?? null);
+              }}
+            />
+          );
+        })}
       </ScrollView>
 
       <TouchableOpacity
         style={[
           styles.confirmButton,
-          !selectedRouteId && styles.disabledButton
+          selectedRouteId == null && styles.disabledButton
         ]}
-        disabled={!selectedRouteId}
+        disabled={selectedRouteId == null}
         onPress={() => router.push('/(driver)/confirm-live')}
       >
         <Text style={styles.confirmButtonText}>CONFIRM SELECTION</Text>

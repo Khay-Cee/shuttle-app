@@ -1,10 +1,10 @@
 // app/(driver)/login.tsx
 
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
+import React, { useMemo, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import { useLogin } from '../../src/api/hooks/useAuth';
 
 const LoginScreen = () => {
@@ -34,9 +34,7 @@ const LoginScreen = () => {
         loginType: 'driver',
       });
 
-      Alert.alert('Success', 'Login successful!', [
-        { text: 'OK', onPress: () => router.replace('/(driver)/shuttle-select') }
-      ]);
+      router.replace('/(driver)/shuttle-select');
     } catch (err: any) {
       setError(apiError || 'Login failed. Please check your credentials.');
       console.error('Driver login error:', err);
@@ -49,15 +47,13 @@ const LoginScreen = () => {
       style={COMMON_STYLES.container}
     >
       <View style={COMMON_STYLES.container}>
-        <Header title="Driver Log In" showBack={true} showMenu={false} />
+        <Header title="Log In" showBack={false} showMenu={false} />
         
         <ScrollView 
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-        {error && <Text style={styles.errorText}>{error}</Text>}
-      
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
@@ -81,6 +77,8 @@ const LoginScreen = () => {
       <TouchableOpacity onPress={() => {/* Handle Forgot Password */}}>
         <Text style={styles.forgotPassword}>Forgot password?</Text>
       </TouchableOpacity>
+      
+      {error && <Text style={styles.errorText}>{error}</Text>}
       
       <TouchableOpacity 
         style={[styles.primaryButton, !isFormValid || isLoading ? styles.disabledButton : {}]}

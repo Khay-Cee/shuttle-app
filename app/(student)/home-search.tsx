@@ -1,8 +1,21 @@
 // app/(student)/home-search.tsx (Student Home Map & Search Screen - Web Fix Applied)
 
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
-import Header from '../../components/Header';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+    Keyboard,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { COLORS } from '../../constants/Styles';
 
 // --- DUMMY DATA ---
 const BUS_STOPS = [
@@ -72,7 +85,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
             {/* Autocomplete List */}
             {isFocused && filteredStops.length > 0 && (
                 <View style={styles.autocompleteList}>
-                    {filteredStops.slice(0, 5).map((item) => (
+                    {filteredStops.slice(0, 5).map((item: string) => (
                         <TouchableOpacity 
                             key={item}
                             style={styles.autocompleteItem}
@@ -131,16 +144,17 @@ const HomeSearchScreen = () => {
         // Update the value FIRST
         if (focusedInput === 'pickup') {
             setPickupStop(stop);
+            // Auto-focus destination after selection
+            setTimeout(() => setFocusedInput('destination'), 100);
         } else if (focusedInput === 'destination') {
             setDestinationStop(stop);
+            // Close the dropdown and dismiss keyboard
+            setFocusedInput(null);
+            Keyboard.dismiss();
         }
-        
-        // THEN close the dropdown and dismiss keyboard
-        setFocusedInput(null);
-        Keyboard.dismiss();
     };
 
-    const searchCardBottom = keyboardOffset > 0 ? keyboardOffset + 10 : 70;
+    const searchCardBottom = keyboardOffset > 0 ? keyboardOffset + 0 : 70;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -153,35 +167,29 @@ const HomeSearchScreen = () => {
                     <Text style={styles.mapFallbackTextSmall}>(Please run on iOS/Android emulator or device)</Text>
                 </View>
             ) : (
-                // MapView for Native (iOS/Android) - loaded via require
-                (() => {
-                    const MapView = require('react-native-maps').default;
-                    const { Marker, PROVIDER_GOOGLE } = require('react-native-maps');
-                    return (
-                        <MapView
-                            style={styles.map}
-                            provider={PROVIDER_GOOGLE}
-                            initialRegion={INITIAL_REGION}
-                            showsUserLocation={true}
+                // MapView for Native (iOS/Android)
+                <MapView
+                    style={styles.map}
+                    provider={PROVIDER_GOOGLE}
+                    initialRegion={INITIAL_REGION}
+                    showsUserLocation
+                >
+                    {/* Render Markers for Live Shuttles */}
+                    {LIVE_SHUTTLES.map(shuttle => (
+                        <Marker
+                            key={shuttle.id}
+                            coordinate={{ latitude: shuttle.lat, longitude: shuttle.lon }}
+                            title={shuttle.route}
+                            description={`ETA: ${shuttle.eta}`}
                         >
-                            {/* Render Markers for Live Shuttles */}
-                            {LIVE_SHUTTLES.map(shuttle => (
-                                <Marker
-                                    key={shuttle.id}
-                                    coordinate={{ latitude: shuttle.lat, longitude: shuttle.lon }}
-                                    title={shuttle.route}
-                                    description={`ETA: ${shuttle.eta}`}
-                                >
-                                    {/* Custom Image for the Bus Icon */}
-                                    <View style={styles.shuttleIconContainer}>
-                                        <Text style={styles.shuttleEta}>{shuttle.eta}</Text>
-                                        <Ionicons name="bus" size={24} color={COLORS.primary} />
-                                    </View>
-                                </Marker>
-                            ))}
-                        </MapView>
-                    );
-                })()
+                            {/* Custom Image for the Bus Icon */}
+                            <View style={styles.shuttleIconContainer}>
+                                <Text style={styles.shuttleEta}>{shuttle.eta}</Text>
+                                <Ionicons name="bus" size={24} color={COLORS.primary} />
+                            </View>
+                        </Marker>
+                    ))}
+                </MapView>
             )}
             
 
@@ -189,7 +197,12 @@ const HomeSearchScreen = () => {
 
             {/* Bottom Search Interface (Floating Card) */}
             <View style={[styles.searchCard, { bottom: searchCardBottom }]}>
-                <ScrollView keyboardShouldPersistTaps="handled">
+                <ScrollView 
+                    keyboardShouldPersistTaps="handled"
+                    scrollEnabled={focusedInput !== null}
+                    nestedScrollEnabled={true}
+                    showsVerticalScrollIndicator={false}
+                >
                     
                     {/* Pick-Up Stop Search */}
                     <SearchInput

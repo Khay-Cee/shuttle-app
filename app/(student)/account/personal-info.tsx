@@ -1,7 +1,20 @@
 // app/(student)/account/personal-info.tsx (Personal Information Edit Screen)
 
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import {
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import Header from '../../../components/Header';
 import { COLORS, COMMON_STYLES } from '../../../constants/Styles';
 
 // --- MOCK DATA ---
@@ -17,7 +30,6 @@ const PersonalInfoScreen = () => {
     const router = useRouter();
     
     const [currentUsername, setCurrentUsername] = useState(INITIAL_USER.username);
-    const [currentPhoto, setCurrentPhoto] = useState(INITIAL_USER.profilePic);
     const [isSaving, setIsSaving] = useState(false);
 
     // Mock function to handle photo selection (e.g., from gallery)
@@ -59,7 +71,7 @@ const PersonalInfoScreen = () => {
                 
                 {/* Profile Photo Section */}
                 <View style={styles.photoSection}>
-                    <Image source={{ uri: currentPhoto }} style={styles.profileImage} />
+                    <Image source={{ uri: INITIAL_USER.profilePic }} style={styles.profileImage} />
                     <TouchableOpacity style={styles.changePhotoButton} onPress={handlePhotoChange}>
                         <Text style={styles.changePhotoButtonText}>Change Photo</Text>
                     </TouchableOpacity>
@@ -97,7 +109,7 @@ const PersonalInfoScreen = () => {
             </ScrollView>
 
             {/* Save Button (Fixed to bottom) */}
-            <View style={styles.saveContainer}>
+            <View>
                 <TouchableOpacity
                     style={[styles.saveButton, isSaving && styles.disabledButton]}
                     onPress={handleSaveChanges}

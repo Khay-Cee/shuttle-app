@@ -1,11 +1,11 @@
 // app/(driver)/signup.tsx
 
-import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Keyboard, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Header from '../../components/Header';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 import { useSignupDriver } from '../../src/api/hooks/useAuth';
 
 // Dummy schools list
@@ -73,15 +73,19 @@ const SignUpScreen = () => {
       style={COMMON_STYLES.container}
     >
       <View style={COMMON_STYLES.container}>
-        <Header title="Driver Sign Up" showBack={true} showMenu={false} />
-
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+        <TouchableOpacity 
+          activeOpacity={1}
+          style={{ flex: 1 }}
+          onPress={() => isSchoolListVisible && setIsSchoolListVisible(false)}
         >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+          <Header title="Sign Up" showBack={false} showMenu={false} />
         
-        {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
         <Text style={styles.label}>First Name</Text>
         <TextInput
@@ -102,28 +106,53 @@ const SignUpScreen = () => {
         />
 
         <Text style={styles.label}>School</Text>
-        <TouchableOpacity
-          style={styles.input}
-          onPress={() => setIsSchoolListVisible(!isSchoolListVisible)}
-          disabled={apiLoading}
-        >
-          <Text style={school ? styles.selectedSchoolText : styles.placeholderText}>
-            {school || 'Select your school'}
-          </Text>
-          <Ionicons name={isSchoolListVisible ? 'chevron-up' : 'chevron-down'} size={24} color={COLORS.primary} style={{ marginLeft: 'auto' }} />
-        </TouchableOpacity>
+        <View style={styles.searchableDropdownContainer}>
+          <TextInput 
+            ref={schoolInputRef}
+            style={styles.inputField} 
+            placeholder="Type or select your school" 
+            placeholderTextColor={'grey'} 
+            value={school} 
+            onChangeText={text => {
+              setSchool(text);
+              setIsSchoolListVisible(true);
+            }}
+            onFocus={() => setIsSchoolListVisible(true)}
+            autoCapitalize="words"
+            editable={!apiLoading}
+          />
+          <TouchableOpacity 
+            style={styles.dropdownToggle} 
+            onPress={() => {
+              setIsSchoolListVisible(prev => !prev);
+              schoolInputRef.current?.focus();
+            }}
+            disabled={apiLoading}
+          >
+            <Ionicons name="chevron-down" size={20} color={COLORS.text} />
+          </TouchableOpacity>
+        </View>
 
-        {isSchoolListVisible && (
-          <View style={styles.dropdownList}>
-            {filteredSchools.map((item) => (
+        {isSchoolListVisible && filteredSchools.length > 0 && (
+          <FlatList
+            data={filteredSchools}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                key={item}
                 style={styles.schoolOption}
                 onPress={() => handleSchoolSelect(item)}
               >
                 <Text style={styles.schoolOptionText}>{item}</Text>
               </TouchableOpacity>
-            ))}
+            )}
+            scrollEnabled={false}
+            nestedScrollEnabled={true}
+            style={styles.dropdownList}
+          />
+        )}
+        {isSchoolListVisible && filteredSchools.length === 0 && (
+          <View style={styles.dropdownList}>
+            <Text style={styles.emptyListText}>No school matches &apos;{school}&apos;</Text>
           </View>
         )}
 
@@ -159,6 +188,7 @@ const SignUpScreen = () => {
           )}
         </TouchableOpacity>
         </ScrollView>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.loginRow}>
@@ -175,6 +205,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 80,
     paddingHorizontal: 20,
+    position: 'relative',
   },
   dropdownList: {
     backgroundColor: COLORS.secondary,
@@ -183,6 +214,31 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 5,
     marginBottom: 10,
+    maxHeight: 200,
+    paddingVertical: 5,
+    position: 'relative',
+    zIndex: 1000,
+  },
+  searchableDropdownContainer: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: COLORS.secondary,
+    marginBottom: 5,
+  },
+  inputField: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  dropdownToggle: {
+    paddingHorizontal: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderLeftWidth: 1,
+    borderLeftColor: COLORS.border,
   },
   label: {
     fontSize: 14,
@@ -223,6 +279,12 @@ const styles = StyleSheet.create({
   schoolOptionText: {
     fontSize: 16,
     color: COLORS.text,
+  },
+  emptyListText: {
+    padding: 10,
+    textAlign: 'center',
+    fontSize: 14,
+    color: COLORS.textFaded,
   },
   errorText: {
     fontSize: 14,

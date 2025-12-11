@@ -1,18 +1,20 @@
 // app/(driver)/live-session.tsx
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useRouter } from 'expo-router';
-import LiveMap from '../../components/LiveMap';
-import { COLORS } from '../../constants/Styles';
-import SessionEndModal from '../../components/SessionEndModal';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import LiveMap from '../../components/LiveMap';
 import SessionEndModal from '../../components/SessionEndModal';
-import { COLORS } from '../constants/Styles';
+import { COLORS } from '../../constants/Styles';
+
 
 const LiveSessionScreen = () => {
   const router = useRouter();

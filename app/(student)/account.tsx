@@ -1,10 +1,21 @@
 // app/(student)/account.tsx (Main Profile/Account Screen)
 
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, COMMON_STYLES } from '../../constants/Styles';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+    Alert,
+    Image,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import Header from '../../components/Header';
 import LogoutSuccessModal from '../../components/LogoutSuccessModal';
-import { COLORS, COMMON_STYLES } from '../constants/Styles';
+import { COLORS, COMMON_STYLES } from '../../constants/Styles';
 
 // --- MOCK DATA ---
 const MOCK_USER = {
